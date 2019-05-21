@@ -1,0 +1,37 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "de.app",
+      "nativeLanguage": "en"
+    },
+    "jhipsterVersion": "5.5.0",
+    "applicationType": "monolith",
+    "baseName": "default",
+    "packageName": "de.app",
+    "packageFolder": "de/app",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "ehcache",
+    "enableHibernateCache": true,
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "prodDatabaseType": "mysql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "MWY0OGJmMzZiMmU0NDlmMGQzZWZmYWMzYzQ0NTkwMTFjZDAwZTY1ZTUyMDI5OWVmOTM5YWU2NGRhZTMzOGUzMGNhZWZmODEzMTA3ZjY5YzM4Yjc5MWVhMmZiM2VhZjZkNjhlYzMyYTRiNzc0YjI1ZmVmODA2NjdmMDc5NTg2YjM=",
+    "clientFramework": "angularX",
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "enableTranslation": true,
+    "nativeLanguage": "en",
+    "languages": [
+      "en"
+    ]
+  }
+}
