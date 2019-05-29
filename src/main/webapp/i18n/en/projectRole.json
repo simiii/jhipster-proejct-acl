@@ -1,0 +1,9 @@
+{
+    "defaultApp": {
+        "ProjectRole" : {
+            "null": "",
+            "PROJECT_USER": "PROJECT_USER",
+            "PROJECT_ADMIN": "PROJECT_ADMIN"
+        }
+    }
+}

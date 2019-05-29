@@ -1,0 +1,17 @@
+entity Project {
+	name String required
+}
+
+entity ProjectAcl {
+	role ProjectRole required
+}
+
+enum ProjectRole {
+	PROJECT_USER,
+	PROJECT_ADMIN
+}
+
+relationship ManyToOne {
+	ProjectAcl{project(name)} to Project,
+	ProjectAcl{user(login)} to User
+}

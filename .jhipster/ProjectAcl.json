@@ -1,0 +1,36 @@
+{
+    "name": "ProjectAcl",
+    "fields": [
+        {
+            "fieldName": "role",
+            "fieldType": "ProjectRole",
+            "fieldValues": "PROJECT_USER,PROJECT_ADMIN",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "project",
+            "otherEntityName": "project",
+            "otherEntityField": "name"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "user",
+            "otherEntityName": "user",
+            "otherEntityField": "login"
+        }
+    ],
+    "changelogDate": "20190528124602",
+    "entityTableName": "project_acl",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
+}

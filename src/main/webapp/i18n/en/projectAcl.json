@@ -1,0 +1,24 @@
+
+{
+    "defaultApp": {
+        "projectAcl" : {
+            "home": {
+                "title": "Project Acls",
+                "createLabel": "Create a new Project Acl",
+                "createOrEditLabel": "Create or edit a Project Acl"
+            },
+            "created": "A new Project Acl is created with identifier {{ param }}",
+            "updated": "A Project Acl is updated with identifier {{ param }}",
+            "deleted": "A Project Acl is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Project Acl {{ id }}?"
+            },
+            "detail": {
+                "title": "Project Acl"
+            },
+            "role": "Role",
+            "project": "Project",
+            "user": "User"
+        }
+    }
+}
