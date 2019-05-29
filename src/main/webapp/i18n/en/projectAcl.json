@@ -3,22 +3,22 @@
     "defaultApp": {
         "projectAcl" : {
             "home": {
-                "title": "Project Acls",
-                "createLabel": "Create a new Project Acl",
-                "createOrEditLabel": "Create or edit a Project Acl"
+                "title": "Project Permissions",
+                "createLabel": "Create a new Project Permission",
+                "createOrEditLabel": "Create or edit a Project Permission"
             },
-            "created": "A new Project Acl is created with identifier {{ param }}",
-            "updated": "A Project Acl is updated with identifier {{ param }}",
-            "deleted": "A Project Acl is deleted with identifier {{ param }}",
+            "created": "A new Project Permission is created with identifier {{ param }}",
+            "updated": "A Project Permission is updated with identifier {{ param }}",
+            "deleted": "A Project Permission is deleted with identifier {{ param }}",
             "delete": {
-                "question": "Are you sure you want to delete Project Acl {{ id }}?"
+                "question": "Are you sure you want to delete Project Permission {{ id }}?"
             },
             "detail": {
-                "title": "Project Acl"
+                "title": "Project Permission"
             },
-            "role": "Role",
-            "project": "Project",
-            "user": "User"
+            "role": "Active Roles",
+            "project": "Projects",
+            "user": "Users"
         }
     }
 }

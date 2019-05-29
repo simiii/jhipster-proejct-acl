@@ -6,6 +6,15 @@ export const enum ProjectRole {
     PROJECT_ADMIN = 'PROJECT_ADMIN'
 }
 
+export interface IUserProjectAcl {
+    user?: IUser;
+    acls?: IProjectAcl[];
+}
+
+export class UserProjectAcl implements IUserProjectAcl {
+    constructor(public user?: IUser, public acls?: IUserProjectAcl[]) {}
+}
+
 export interface IProjectAcl {
     id?: number;
     role?: ProjectRole;

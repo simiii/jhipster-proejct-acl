@@ -1,21 +1,22 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Subscription } from 'rxjs';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
-
-import { IProjectAcl } from 'app/shared/model/project-acl.model';
-import { Principal } from 'app/core';
-import { ProjectAclService } from './project-acl.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Principal } from 'app/core';
+import { IProjectAcl, IUserProjectAcl, UserProjectAcl } from 'app/shared/model/project-acl.model';
 import { IProject } from 'app/shared/model/project.model';
+import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
+import { Subscription } from 'rxjs';
+import { ProjectAclService } from './project-acl.service';
 
 @Component({
     selector: 'jhi-project-acl',
     templateUrl: './project-acl.component.html'
 })
 export class ProjectAclComponent implements OnInit, OnDestroy {
-    projectAcls: IProjectAcl[];
     project: IProject;
+    userProjectAcls: IUserProjectAcl[];
+    acls: IUserProjectAcl[];
+
     currentAccount: any;
     eventSubscriber: Subscription;
 
@@ -28,11 +29,19 @@ export class ProjectAclComponent implements OnInit, OnDestroy {
     ) {}
 
     loadAll() {
+        this.userProjectAcls = [];
         this.activatedRoute.data.subscribe(({ project }) => {
             this.project = project;
             this.projectAclService.query(this.project.id).subscribe(
                 (res: HttpResponse<IProjectAcl[]>) => {
-                    this.projectAcls = res.body;
+                    res.body.forEach((projectAcl: IProjectAcl) => {
+                        const idx = this.userProjectAcls.findIndex(item => {
+                            return item.user.id === projectAcl.user.id;
+                        });
+                        idx !== -1
+                            ? this.userProjectAcls[idx].acls.push(projectAcl)
+                            : this.userProjectAcls.push(new UserProjectAcl(projectAcl.user, [projectAcl]));
+                    });
                 },
                 (res: HttpErrorResponse) => this.onError(res.message)
             );
@@ -62,4 +71,6 @@ export class ProjectAclComponent implements OnInit, OnDestroy {
     private onError(errorMessage: string) {
         this.jhiAlertService.error(errorMessage, null, null);
     }
+
+    addToProjectAcl(projectAcl, evt) {}
 }

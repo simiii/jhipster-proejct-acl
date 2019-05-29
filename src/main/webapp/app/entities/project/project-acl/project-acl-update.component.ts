@@ -29,7 +29,7 @@ export class ProjectAclUpdateComponent implements OnInit {
         this.isSaving = false;
         this.activatedRoute.data.subscribe(({ project, projectAcl }) => {
             this.projectAcl = projectAcl;
-            this.projects.push(project);
+            this.projectAcl.project = project;
         });
         this.userService.query().subscribe(
             (res: HttpResponse<IUser[]>) => {

@@ -3,7 +3,8 @@
         <button type="submit" [routerLink]="['/project']" class="btn btn-info float-right ml-1">
             <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
         </button>
-        <span jhiTranslate="defaultApp.projectAcl.home.title">Project Acls</span>
+        <span jhiTranslate="defaultApp.projectAcl.home.title">Project Permissions</span>
+        <span>{{ project.name }}</span>
         <button
             id="jh-create-entity"
             class="btn btn-primary float-right jh-create-entity create-project-acl"
@@ -17,62 +18,46 @@
     </h2>
     <jhi-alert></jhi-alert>
     <br />
-    <div class="table-responsive" *ngIf="projectAcls">
+    <div class="table-responsive" *ngIf="userProjectAcls">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th><span jhiTranslate="global.field.id">ID</span></th>
-                    <th><span jhiTranslate="defaultApp.projectAcl.role">Role</span></th>
-                    <th><span jhiTranslate="defaultApp.projectAcl.project">Project</span></th>
                     <th><span jhiTranslate="defaultApp.projectAcl.user">User</span></th>
+                    <th><span jhiTranslate="defaultApp.projectAcl.role">Role</span></th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let projectAcl of projectAcls; trackBy: trackId">
-                    <td>
-                        <a [routerLink]="['/project-acl', projectAcl.id, 'view']">{{ projectAcl.id }}</a>
-                    </td>
-                    <td jhiTranslate="{{ 'defaultApp.ProjectRole.' + projectAcl.role }}">{{ projectAcl.role }}</td>
-                    <td>
-                        <div *ngIf="projectAcl.project">
-                            <a [routerLink]="['../project', projectAcl.project?.id, 'view']">{{ projectAcl.project?.name }}</a>
-                        </div>
-                    </td>
+                <tr *ngFor="let projectAcl of userProjectAcls; trackBy: trackId">
                     <td>
                         {{ projectAcl.user?.login }}
                     </td>
+
+                    <td>
+                        <span *ngFor="let acl of projectAcl.acls">
+                            <span class="badge badge-info"
+                                >{{ acl.role }}
+                                <a *ngIf="currentAccount.id !== acl.user.id"
+                                    ><fa-icon
+                                        [routerLink]="[
+                                            '/',
+                                            { outlets: { popup: 'project/' + acl.project.id + '/project-acl/' + acl.id + '/delete' } }
+                                        ]"
+                                        replaceUrl="true"
+                                        queryParamsHandling="merge"
+                                        [icon]="'times'"
+                                    ></fa-icon></a
+                            ></span>
+                            &nbsp;
+                        </span>
+                    </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
-                            <button
-                                type="submit"
-                                [routerLink]="['/project', project.id, 'project-acl', projectAcl.id, 'view']"
-                                class="btn btn-info btn-sm"
-                            >
-                                <fa-icon [icon]="'eye'"></fa-icon>
-                                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
-                            </button>
-                            <button
-                                type="submit"
-                                [routerLink]="['/project', project.id, 'project-acl', projectAcl.id, 'edit']"
-                                class="btn btn-primary btn-sm"
-                            >
-                                <fa-icon [icon]="'pencil-alt'"></fa-icon>
-                                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
-                            </button>
-                            <button
-                                type="submit"
-                                [routerLink]="[
-                                    '/',
-                                    { outlets: { popup: 'project/' + project.id + '/project-acl/' + projectAcl.id + '/delete' } }
-                                ]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm"
-                            >
-                                <fa-icon [icon]="'times'"></fa-icon>
-                                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
-                            </button>
+                            <select class="form-control" name="role" (change)="addToProjectAcl(projectAcl, $event)" id="field_role" required>
+                                <option value="null"></option>
+                                <option value="PROJECT_USER">{{ 'defaultApp.ProjectRole.PROJECT_USER' | translate }}</option>
+                                <option value="PROJECT_ADMIN">{{ 'defaultApp.ProjectRole.PROJECT_ADMIN' | translate }}</option>
+                            </select>
                         </div>
                     </td>
                 </tr>

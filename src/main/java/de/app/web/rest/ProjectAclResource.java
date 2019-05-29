@@ -114,7 +114,7 @@ public class ProjectAclResource
 	@Timed
 	public List<ProjectAcl> getAllProjectAcls(@RequestHeader(value = "X-PROJECT-ID", required = true) Long projectId) {
 		log.debug("REST request to get all ProjectAcls");
-		return projectAclRepository.findAll();
+		return projectAclRepository.findByProjectId(projectId);
 	}
 
 	/**

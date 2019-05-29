@@ -20,4 +20,6 @@ public interface ProjectAclRepository extends JpaRepository<ProjectAcl, Long> {
     @Query("select project_acl from ProjectAcl project_acl where project_acl.user.id = ?1")
     List<ProjectAcl> findByUserId(Long userId);
 
+	List<ProjectAcl> findByProjectId(Long projectId);
+
 }
