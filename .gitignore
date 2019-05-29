@@ -1,9 +1,9 @@
 ######################
 # Project Specific
 ######################
-/src/main/webapp/content/css/main.css
 /target/www/**
 /src/test/javascript/coverage/
+/src/test/javascript/PhantomJS*/
 
 ######################
 # Node
@@ -12,8 +12,7 @@
 node_tmp/
 node_modules/
 npm-debug.log.*
-/.awcache/*
-/.cache-loader/*
+package-lock.json
 
 ######################
 # SASS
@@ -39,6 +38,8 @@ local.properties
 .factorypath
 /src/main/resources/rebel.xml
 
+.dbeaver-data-sources.xml
+
 # External tool builders
 .externalToolBuilders/**
 
@@ -61,7 +62,6 @@ local.properties
 *.ids
 *.orig
 classes/
-out/
 
 ######################
 # Visual Studio Code
@@ -119,7 +119,7 @@ Desktop.ini
 ######################
 # Logs
 ######################
-*.log*
+*.log
 
 ######################
 # Others
@@ -143,3 +143,7 @@ Desktop.ini
 # ESLint
 ######################
 .eslintcache
+
+src/main/resources/.h2.server.properties
+/.apt_generated/
+/.angulardoc.json
