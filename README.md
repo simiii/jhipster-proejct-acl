@@ -1,5 +1,8 @@
-# default
+# jhipster-proejct-acl
 This application was generated using JHipster 5.5.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v5.5.0](https://www.jhipster.tech/documentation-archive/v5.5.0).
+
+Jhipster App to manage acl for tenant/project related data
+
 
 ## Development
 
@@ -77,7 +80,7 @@ For example, the following command:
 
     ng generate component my-component
 
-will generate few files:
+will generate few files: 
 
     create src/main/webapp/app/my-component/my-component.component.html
     create src/main/webapp/app/my-component/my-component.component.ts
