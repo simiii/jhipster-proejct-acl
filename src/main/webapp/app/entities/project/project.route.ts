@@ -12,6 +12,7 @@ import { ProjectDetailComponent } from './project-detail.component';
 import { ProjectUpdateComponent } from './project-update.component';
 import { ProjectComponent } from './project.component';
 import { ProjectService } from './project.service';
+import { JhiResolvePagingParams } from 'ng-jhipster';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectResolve implements Resolve<IProject> {
@@ -91,7 +92,8 @@ export const projectRoute: Routes = [
         path: 'project/:id/project-acl',
         component: ProjectAclComponent,
         resolve: {
-            project: ProjectResolve
+            project: ProjectResolve,
+            pagingParams: JhiResolvePagingParams
         },
         data: {
             authorities: ['ROLE_USER'],

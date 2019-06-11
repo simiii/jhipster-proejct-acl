@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -28,7 +27,6 @@ import com.codahale.metrics.annotation.Timed;
 import de.app.domain.ProjectAcl;
 import de.app.repository.ProjectAclRepository;
 import de.app.repository.ProjectRepository;
-import de.app.repository.UserRepository;
 import de.app.web.rest.errors.BadRequestAlertException;
 import de.app.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -46,13 +44,11 @@ public class ProjectAclResource
 	private static final String		ENTITY_NAME	= "projectAcl";
 
 	private ProjectAclRepository	projectAclRepository;
-	private UserRepository			userRepository;
 	private ProjectRepository		projectRepository;
 
-	public ProjectAclResource(ProjectAclRepository projectAclRepository, UserRepository userRepository, ProjectRepository projectRepository)
+	public ProjectAclResource(ProjectAclRepository projectAclRepository, ProjectRepository projectRepository)
 	{
 		this.projectAclRepository = projectAclRepository;
-		this.userRepository = userRepository;
 		this.projectRepository = projectRepository;
 	}
 
@@ -128,19 +124,7 @@ public class ProjectAclResource
 		projectRepository.findById(projectId)
 			.ifPresent(project -> {
 				final List<ProjectAcl> findByProjectId = projectAclRepository.findByProjectId(projectId);
-				final List<ProjectAcl> defaultAclList = userRepository.findAll()
-					.stream()
-					.map(u -> new ProjectAcl()
-						.project(project)
-						.user(u))
-					.filter(projectAcl -> findByProjectId.stream()
-						.filter(a -> !projectAcl.getUser().equals(a.getUser()))
-						.findFirst()
-						.isPresent())
-					.collect(Collectors.toList());
-
 				result.addAll(findByProjectId);
-				result.addAll(defaultAclList);
 			});
 
 		return result;
