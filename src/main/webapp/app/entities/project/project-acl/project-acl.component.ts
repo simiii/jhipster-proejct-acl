@@ -1,8 +1,8 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Principal } from 'app/core';
-import { IProjectAcl, IUserProjectAcl, UserProjectAcl } from 'app/shared/model/project-acl.model';
+import { IUser, Principal } from 'app/core';
+import { IProjectAcl, IUserProjectAcl, UserProjectAcl, ProjectAcl, ProjectRole } from 'app/shared/model/project-acl.model';
 import { IProject } from 'app/shared/model/project.model';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 import { Subscription } from 'rxjs';
@@ -16,6 +16,7 @@ export class ProjectAclComponent implements OnInit, OnDestroy {
     project: IProject;
     userProjectAcls: IUserProjectAcl[];
     acls: IUserProjectAcl[];
+    roles = ['PROJECT_USER', 'PROJECT_ADMIN'];
 
     currentAccount: any;
     eventSubscriber: Subscription;
@@ -72,5 +73,33 @@ export class ProjectAclComponent implements OnInit, OnDestroy {
         this.jhiAlertService.error(errorMessage, null, null);
     }
 
-    addToProjectAcl(projectAcl, evt) {}
+    deletePermission(projectAcl) {
+        this.projectAclService.delete(projectAcl.id, this.project.id).subscribe(() => {
+            this.eventManager.broadcast({
+                name: 'projectAclListModification',
+                content: 'Deleted an projectAcl'
+            });
+        });
+    }
+
+    addPermission(user: IUser, role: ProjectRole) {
+        this.projectAclService.create(new ProjectAcl(null, role, this.project, user)).subscribe(() => {
+            this.eventManager.broadcast({
+                name: 'projectAclListModification',
+                content: 'Deleted an projectAcl'
+            });
+        });
+    }
+
+    containsRole(role, roles): boolean {
+        let result = false;
+        for (let index = 0; index < roles.length; index++) {
+            const element = roles[index].role;
+            if (role === element) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 }

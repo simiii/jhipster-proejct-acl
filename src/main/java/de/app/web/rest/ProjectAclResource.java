@@ -2,8 +2,10 @@ package de.app.web.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -25,6 +27,8 @@ import com.codahale.metrics.annotation.Timed;
 
 import de.app.domain.ProjectAcl;
 import de.app.repository.ProjectAclRepository;
+import de.app.repository.ProjectRepository;
+import de.app.repository.UserRepository;
 import de.app.web.rest.errors.BadRequestAlertException;
 import de.app.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -42,10 +46,14 @@ public class ProjectAclResource
 	private static final String		ENTITY_NAME	= "projectAcl";
 
 	private ProjectAclRepository	projectAclRepository;
+	private UserRepository			userRepository;
+	private ProjectRepository		projectRepository;
 
-	public ProjectAclResource(ProjectAclRepository projectAclRepository)
+	public ProjectAclResource(ProjectAclRepository projectAclRepository, UserRepository userRepository, ProjectRepository projectRepository)
 	{
 		this.projectAclRepository = projectAclRepository;
+		this.userRepository = userRepository;
+		this.projectRepository = projectRepository;
 	}
 
 	/**
@@ -114,7 +122,28 @@ public class ProjectAclResource
 	@Timed
 	public List<ProjectAcl> getAllProjectAcls(@RequestHeader(value = "X-PROJECT-ID", required = true) Long projectId) {
 		log.debug("REST request to get all ProjectAcls");
-		return projectAclRepository.findByProjectId(projectId);
+
+		final List<ProjectAcl> result = new ArrayList<>();
+
+		projectRepository.findById(projectId)
+			.ifPresent(project -> {
+				final List<ProjectAcl> findByProjectId = projectAclRepository.findByProjectId(projectId);
+				final List<ProjectAcl> defaultAclList = userRepository.findAll()
+					.stream()
+					.map(u -> new ProjectAcl()
+						.project(project)
+						.user(u))
+					.filter(projectAcl -> findByProjectId.stream()
+						.filter(a -> !projectAcl.getUser().equals(a.getUser()))
+						.findFirst()
+						.isPresent())
+					.collect(Collectors.toList());
+
+				result.addAll(findByProjectId);
+				result.addAll(defaultAclList);
+			});
+
+		return result;
 	}
 
 	/**

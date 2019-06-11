@@ -4,10 +4,6 @@ import { RouterModule } from '@angular/router';
 import { DefaultSharedModule } from 'app/shared';
 import {
     ProjectAclComponent,
-    ProjectAclDetailComponent,
-    ProjectAclUpdateComponent,
-    ProjectAclDeletePopupComponent,
-    ProjectAclDeleteDialogComponent,
     ProjectComponent,
     ProjectDetailComponent,
     ProjectUpdateComponent,
@@ -16,18 +12,13 @@ import {
     projectRoute,
     projectPopupRoute
 } from './';
-import { projectAclPopupRoute } from './project.route';
 
-const ENTITY_STATES = [...projectRoute, ...projectPopupRoute, ...projectAclPopupRoute];
+const ENTITY_STATES = [...projectRoute, ...projectPopupRoute];
 
 @NgModule({
     imports: [DefaultSharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         ProjectAclComponent,
-        ProjectAclDetailComponent,
-        ProjectAclUpdateComponent,
-        ProjectAclDeletePopupComponent,
-        ProjectAclDeleteDialogComponent,
         ProjectComponent,
         ProjectDetailComponent,
         ProjectUpdateComponent,
@@ -36,10 +27,6 @@ const ENTITY_STATES = [...projectRoute, ...projectPopupRoute, ...projectAclPopup
     ],
     entryComponents: [
         ProjectAclComponent,
-        ProjectAclDetailComponent,
-        ProjectAclUpdateComponent,
-        ProjectAclDeletePopupComponent,
-        ProjectAclDeleteDialogComponent,
         ProjectComponent,
         ProjectUpdateComponent,
         ProjectDeleteDialogComponent,

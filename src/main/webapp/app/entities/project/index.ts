@@ -1,7 +1,4 @@
 export * from './project-acl/project-acl.service';
-export * from './project-acl/project-acl-update.component';
-export * from './project-acl/project-acl-delete-dialog.component';
-export * from './project-acl/project-acl-detail.component';
 export * from './project-acl/project-acl.component';
 export * from './project.service';
 export * from './project-update.component';
