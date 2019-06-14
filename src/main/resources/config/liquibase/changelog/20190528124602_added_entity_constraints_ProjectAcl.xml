@@ -10,12 +10,14 @@
         
         <addForeignKeyConstraint baseColumnNames="project_id"
                                  baseTableName="project_acl"
+                                 onDelete="CASCADE"
                                  constraintName="fk_project_acl_project_id"
                                  referencedColumnNames="id"
                                  referencedTableName="project"/>
 
         <addForeignKeyConstraint baseColumnNames="user_id"
                                  baseTableName="project_acl"
+                                 onDelete="CASCADE"
                                  constraintName="fk_project_acl_user_id"
                                  referencedColumnNames="id"
                                  referencedTableName="jhi_user"/>

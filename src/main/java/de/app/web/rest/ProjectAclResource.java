@@ -44,6 +44,7 @@ public class ProjectAclResource
 	private static final String		ENTITY_NAME	= "projectAcl";
 
 	private ProjectAclRepository	projectAclRepository;
+
 	private ProjectRepository		projectRepository;
 
 	public ProjectAclResource(ProjectAclRepository projectAclRepository, ProjectRepository projectRepository)

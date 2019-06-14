@@ -1,11 +1,14 @@
 package de.app.web.rest;
 
 import de.app.DefaultApp;
-
+import de.app.domain.Project;
 import de.app.domain.ProjectAcl;
+import de.app.domain.enumeration.ProjectRole;
 import de.app.repository.ProjectAclRepository;
+import de.app.repository.ProjectRepository;
+import de.app.service.ProjectService;
 import de.app.web.rest.errors.ExceptionTranslator;
-
+import de.app.web.rest.util.HttpConstants;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -23,14 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-
 import static de.app.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import de.app.domain.enumeration.ProjectRole;
 /**
  * Test class for the ProjectAclResource REST controller.
  *
@@ -45,6 +47,12 @@ public class ProjectAclResourceIntTest {
 
     @Autowired
     private ProjectAclRepository projectAclRepository;
+
+    @Autowired
+    private ProjectService projectService;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -62,10 +70,13 @@ public class ProjectAclResourceIntTest {
 
     private ProjectAcl projectAcl;
 
+
+    private Project project;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ProjectAclResource projectAclResource = new ProjectAclResource(projectAclRepository);
+        final ProjectAclResource projectAclResource = new ProjectAclResource(projectAclRepository, projectRepository);
         this.restProjectAclMockMvc = MockMvcBuilders.standaloneSetup(projectAclResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -75,29 +86,33 @@ public class ProjectAclResourceIntTest {
 
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static ProjectAcl createEntity(EntityManager em) {
-        ProjectAcl projectAcl = new ProjectAcl()
-            .role(DEFAULT_ROLE);
+    public static ProjectAcl createEntity(EntityManager em, Project project) {
+        final ProjectAcl projectAcl = new ProjectAcl()
+            .role(DEFAULT_ROLE)
+            .project(project);
         return projectAcl;
     }
 
     @Before
     public void initTest() {
-        projectAcl = createEntity(em);
+        project = projectService.saveWithAcl(ProjectResourceIntTest.createEntity(em));
+        projectAcl = createEntity(em, project);
     }
 
     @Test
     @Transactional
+    @WithMockUser("user")
     public void createProjectAcl() throws Exception {
         int databaseSizeBeforeCreate = projectAclRepository.findAll().size();
 
         // Create the ProjectAcl
         restProjectAclMockMvc.perform(post("/api/project-acls")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .header(HttpConstants.X_PROJECT_HEADER, this.project.getId())
             .content(TestUtil.convertObjectToJsonBytes(projectAcl)))
             .andExpect(status().isCreated());
 
@@ -110,6 +125,7 @@ public class ProjectAclResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser("user")
     public void createProjectAclWithExistingId() throws Exception {
         int databaseSizeBeforeCreate = projectAclRepository.findAll().size();
 
@@ -118,6 +134,7 @@ public class ProjectAclResourceIntTest {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restProjectAclMockMvc.perform(post("/api/project-acls")
+            .header(HttpConstants.X_PROJECT_HEADER, this.project.getId())
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(projectAcl)))
             .andExpect(status().isBadRequest());
@@ -129,6 +146,7 @@ public class ProjectAclResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser("user")
     public void checkRoleIsRequired() throws Exception {
         int databaseSizeBeforeTest = projectAclRepository.findAll().size();
         // set the field null
@@ -137,6 +155,7 @@ public class ProjectAclResourceIntTest {
         // Create the ProjectAcl, which fails.
 
         restProjectAclMockMvc.perform(post("/api/project-acls")
+            .header(HttpConstants.X_PROJECT_HEADER, this.project.getId())
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(projectAcl)))
             .andExpect(status().isBadRequest());
@@ -147,26 +166,30 @@ public class ProjectAclResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser("user")
     public void getAllProjectAcls() throws Exception {
         // Initialize the database
         projectAclRepository.saveAndFlush(projectAcl);
 
         // Get all the projectAclList
-        restProjectAclMockMvc.perform(get("/api/project-acls?sort=id,desc"))
+        restProjectAclMockMvc.perform(get("/api/project-acls?sort=id,desc")
+            .header(HttpConstants.X_PROJECT_HEADER, this.project.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(projectAcl.getId().intValue())))
             .andExpect(jsonPath("$.[*].role").value(hasItem(DEFAULT_ROLE.toString())));
     }
-    
+
     @Test
     @Transactional
+    @WithMockUser("user")
     public void getProjectAcl() throws Exception {
         // Initialize the database
         projectAclRepository.saveAndFlush(projectAcl);
 
         // Get the projectAcl
-        restProjectAclMockMvc.perform(get("/api/project-acls/{id}", projectAcl.getId()))
+        restProjectAclMockMvc.perform(get("/api/project-acls/{id}", projectAcl.getId())
+            .header(HttpConstants.X_PROJECT_HEADER, this.project.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(projectAcl.getId().intValue()))
@@ -175,14 +198,17 @@ public class ProjectAclResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser("user")
     public void getNonExistingProjectAcl() throws Exception {
         // Get the projectAcl
-        restProjectAclMockMvc.perform(get("/api/project-acls/{id}", Long.MAX_VALUE))
+        restProjectAclMockMvc.perform(get("/api/project-acls/{id}", Long.MAX_VALUE)
+            .header(HttpConstants.X_PROJECT_HEADER, this.project.getId()))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
+    @WithMockUser("user")
     public void updateProjectAcl() throws Exception {
         // Initialize the database
         projectAclRepository.saveAndFlush(projectAcl);
@@ -197,6 +223,7 @@ public class ProjectAclResourceIntTest {
             .role(UPDATED_ROLE);
 
         restProjectAclMockMvc.perform(put("/api/project-acls")
+            .header(HttpConstants.X_PROJECT_HEADER, this.project.getId())
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(updatedProjectAcl)))
             .andExpect(status().isOk());
@@ -210,6 +237,7 @@ public class ProjectAclResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser("user")
     public void updateNonExistingProjectAcl() throws Exception {
         int databaseSizeBeforeUpdate = projectAclRepository.findAll().size();
 
@@ -217,6 +245,7 @@ public class ProjectAclResourceIntTest {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restProjectAclMockMvc.perform(put("/api/project-acls")
+            .header(HttpConstants.X_PROJECT_HEADER, this.project.getId())
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(projectAcl)))
             .andExpect(status().isBadRequest());
@@ -228,6 +257,7 @@ public class ProjectAclResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser("user")
     public void deleteProjectAcl() throws Exception {
         // Initialize the database
         projectAclRepository.saveAndFlush(projectAcl);
@@ -236,6 +266,7 @@ public class ProjectAclResourceIntTest {
 
         // Get the projectAcl
         restProjectAclMockMvc.perform(delete("/api/project-acls/{id}", projectAcl.getId())
+            .header(HttpConstants.X_PROJECT_HEADER, this.project.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
@@ -246,6 +277,7 @@ public class ProjectAclResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser("user")
     public void equalsVerifier() throws Exception {
         TestUtil.equalsVerifier(ProjectAcl.class);
         ProjectAcl projectAcl1 = new ProjectAcl();

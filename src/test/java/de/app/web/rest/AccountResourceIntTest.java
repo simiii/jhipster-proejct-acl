@@ -10,12 +10,12 @@ import de.app.security.AuthoritiesConstants;
 import de.app.service.MailService;
 import de.app.service.UserService;
 import de.app.service.dto.PasswordChangeDTO;
+import de.app.service.dto.ProjectAclDTO;
 import de.app.service.dto.UserDTO;
 import de.app.web.rest.errors.ExceptionTranslator;
 import de.app.web.rest.vm.KeyAndPasswordVM;
 import de.app.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.RandomStringUtils;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,13 +33,17 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -118,6 +122,7 @@ public class AccountResourceIntTest {
     }
 
     @Test
+    @WithMockUser("user")
     public void testGetExistingAccount() throws Exception {
         Set<Authority> authorities = new HashSet<>();
         Authority authority = new Authority();
@@ -133,6 +138,12 @@ public class AccountResourceIntTest {
         user.setLangKey("en");
         user.setAuthorities(authorities);
         when(mockUserService.getUserWithAuthorities()).thenReturn(Optional.of(user));
+
+        Set<ProjectAclDTO> projectAclDtos = new HashSet<>();
+        UserDTO t = new UserDTO(user);
+        t.setProjectRoles(projectAclDtos);
+
+        when(mockUserService.enrichtWithProjectRoles(any())).thenReturn(t);
 
         restUserMockMvc.perform(get("/api/account")
             .accept(MediaType.APPLICATION_JSON))
